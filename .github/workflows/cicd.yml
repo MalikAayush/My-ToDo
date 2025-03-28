@@ -1,0 +1,78 @@
+name: Flask CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code from repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Run tests 
+      - name: Run tests
+        run: |
+          pytest 
+
+  # docker-build:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+    
+  #   steps:
+  #     # Step 1: Checkout code from repository
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+      
+  #     # Step 2: Build the Docker image
+  #     - name: Build Docker Image
+  #       run: |
+  #         docker build --file Dockerfile --tag flask-app:${{ github.sha }} .
+
+  # deploy:
+  #   needs: docker-build
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     # Step 1: Checkout code from repository
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     # Step 2: Set up Docker Buildx
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+
+  #     # Step 3: Login to DockerHub
+  #     - name: Login to DockerHub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME }}
+  #         password: ${{ secrets.DOCKER_PASSWORD }}
+
+  #     # Step 4: Build and Push Docker Image to DockerHub
+  #     - name: Build and Push Docker Image 
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         file: ./Dockerfile
+  #         push: true
+  #         tags: ${{ secrets.DOCKER_USERNAME }}/flask-app:${{ github.sha }}
